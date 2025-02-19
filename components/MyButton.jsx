@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
+import colors from '../colors/colors';
 
 const MyButton = ({ onPress, title, color, disabled }) => {
   return (
@@ -7,7 +8,7 @@ const MyButton = ({ onPress, title, color, disabled }) => {
       onPress={disabled ? null : onPress} // Disable onPress if the button is disabled
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: disabled ? '#cccccc' : color }, // Change color when disabled
+        { backgroundColor: disabled ? '#cccccc' : colors.BLUE }, // Change color when disabled
         pressed && !disabled && styles.buttonPressed, // Apply pressed style only if not disabled
       ]}
       disabled={disabled} // Pass the disabled prop to Pressable
@@ -19,18 +20,21 @@ const MyButton = ({ onPress, title, color, disabled }) => {
 
 const styles = StyleSheet.create({
   button: {
-    padding: 20,
-    borderRadius: 5,
+    width: '90%',
+    padding: 10,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 20
+    marginVertical: 20,
+    color: 'green',
   },
   buttonPressed: {
     opacity: 0.7,
   },
   text: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 30,
+    fontWeight: 'semibold',
   },
 });
 
