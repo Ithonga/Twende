@@ -2,25 +2,17 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Header from '../../components/Header'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Search from '../../components/Search'
 
-const home = () => {
+const explore = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
-                <Header title='Discover' />
-                <Search/>
+                <Header title='Explore' />
             </View>
         </SafeAreaView>
     )
 }
 
-export default home
+export default explore
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        // backgroundColor: "white",
-        paddingHorizontal: 10
-    },
-})
+const styles = StyleSheet.create({})
