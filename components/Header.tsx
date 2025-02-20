@@ -32,7 +32,7 @@ const Header = ({ title }: { title: string }) => {
                   </Text>
                   <Text>{user?.emailAddresses[0].emailAddress}</Text>
                 </View> */}
-                <Image source={require('../assets/icon.png')} style={{ width: 50, height: 50, borderRadius: 50 }} />
+                <Image source={require('../assets/user.jpg')} style={{ width: 50, height: 50, borderRadius: 50 }} />
         </View>
       </View>
       <View>
