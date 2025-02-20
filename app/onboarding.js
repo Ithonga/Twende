@@ -9,16 +9,17 @@ import {
 } from "react-native";
 import Onboarding from "react-native-onboarding-swiper";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import colors from "../colors/colors";
-import MyButton from "../components/MyButton";
 
 const { width, height } = Dimensions.get("window");
 
 const OnBoardingScreen = () => {
   const router = useRouter();
 
-  const handleFinish = () => {
-    router.replace("/home");
+  const handleFinish = async () => {
+    await AsyncStorage.setItem("onboardingCompleted", "true"); // Save completion
+    router.replace("(auth)/loginScreen"); // Navigate to authentication screen
   };
 
   const DoneButton = ({ ...props }) => (
@@ -34,61 +35,58 @@ const OnBoardingScreen = () => {
   );
 
   return (
-    <>
-      <Onboarding
-        DoneButtonComponent={DoneButton}
-        SkipButtonComponent={SkipButton}
-        bottomBarColor="transparent"
-        bottomBarHighlight={false} // Removes default shadow
-        bottomBarContainerStyle={styles.bottomBar}
-        containerStyles={{ flex: 1 }} // Ensures full-screen background
-        pages={[
-          {
-            backgroundColor: "#fff",
-            image: (
-              <ImageBackground
-                source={require("../assets/icon.png")}
-                style={styles.imageBackground}
-                resizeMode="cover"
-              />
-            ),
-            title: "Welcome",
-            subtitle: "Discover amazing features in our app!",
-          },
-          {
-            backgroundColor: "#fdeb93",
-            image: (
-              <ImageBackground
-                source={require("../assets/icon.png")}
-                style={styles.imageBackground}
-                resizeMode="cover"
-              />
-            ),
-            title: "Stay Organized",
-            subtitle: "Manage your tasks efficiently with our tools.",
-          },
-          {
-            backgroundColor: "#e9bcbe",
-            image: (
-              <ImageBackground
-                source={require("../assets/icon.png")}
-                style={styles.imageBackground}
-                resizeMode="cover"
-              />
-            ),
-            title: "Get Started",
-            subtitle: "Let's begin your journey with us!",
-
-          },
-        ]}
-      />
-    </>
+    <Onboarding
+      DoneButtonComponent={DoneButton}
+      SkipButtonComponent={SkipButton}
+      bottomBarColor="transparent"
+      bottomBarHighlight={false}
+      bottomBarContainerStyle={styles.bottomBar}
+      containerStyles={{ flex: 1 }}
+      pages={[
+        {
+          backgroundColor: "#fff",
+          image: (
+            <ImageBackground
+              source={require("../assets/icon.png")}
+              style={styles.imageBackground}
+              resizeMode="cover"
+            />
+          ),
+          title: "Welcome",
+          subtitle: "Discover amazing features in our app!",
+        },
+        {
+          backgroundColor: "#fdeb93",
+          image: (
+            <ImageBackground
+              source={require("../assets/icon.png")}
+              style={styles.imageBackground}
+              resizeMode="cover"
+            />
+          ),
+          title: "Stay Organized",
+          subtitle: "Manage your tasks efficiently with our tools.",
+        },
+        {
+          backgroundColor: "#e9bcbe",
+          image: (
+            <ImageBackground
+              source={require("../assets/icon.png")}
+              style={styles.imageBackground}
+              resizeMode="cover"
+            />
+          ),
+          title: "Get Started",
+          subtitle: "Let's begin your journey with us!",
+        },
+      ]}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   bottomBar: {
-    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0,0,0,0.5)",
     paddingVertical: 10,
   },
   button: {

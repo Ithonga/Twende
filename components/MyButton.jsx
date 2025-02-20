@@ -20,13 +20,12 @@ const MyButton = ({ onPress, title, color, disabled }) => {
 
 const styles = StyleSheet.create({
   button: {
-    width: '90%',
+    width: '100%',
     padding: 10,
-    borderRadius: 50,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 20,
-    color: 'green',
   },
   buttonPressed: {
     opacity: 0.7,
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
   text: {
     color: 'white',
     fontSize: 30,
-    fontWeight: 'semibold',
+    fontWeight: 'bold',
   },
 });
 

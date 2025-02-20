@@ -7,29 +7,45 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { Link } from "expo-router";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-createUserWithEmailAndPassword;
+import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import MyButton from "../../components/MyButton";
-import { useState } from "react";
 
-const signUpScreen = () => {
+const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const onHandleSignUp = () => {
     if (email !== "" && password !== "") {
       createUserWithEmailAndPassword(auth, email, password)
-        .then(() => console.log("Login successful"))
-        .catch((error) => Alert.alert("Login failed", error.message));
+        .then((userCredential) => {
+          // Send email verification
+          sendEmailVerification(userCredential.user)
+            .then(() => {
+              Alert.alert(
+                "Verification Email Sent",
+                "Please check your email to verify your account."
+              );
+              // Redirect to home after successful sign-up
+              router.replace("/home");
+            })
+            .catch((error) => Alert.alert("Verification failed", error.message));
+        })
+        .catch((error) => Alert.alert("Sign-up failed", error.message));
+    } else {
+      Alert.alert("Error", "Email and password cannot be empty.");
     }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        {/* <Text style={styles.text}>ACACIA</Text> */}
         <Image source={require("../../assets/Logo.png")} style={styles.img} />
         <Text style={styles.text}>Create your Account</Text>
         <TextInput
@@ -38,7 +54,6 @@ const signUpScreen = () => {
           placeholderTextColor="#888"
           keyboardType="email-address"
           textContentType="emailAddress"
-          autoFocus={false}
           value={email}
           onChangeText={(text) => setEmail(text)}
           style={styles.inputField}
@@ -47,19 +62,13 @@ const signUpScreen = () => {
           placeholder="Password"
           autoCapitalize="none"
           secureTextEntry={true}
-          autoCorrect={false}
           textContentType="password"
           placeholderTextColor="#888"
           value={password}
           onChangeText={(text) => setPassword(text)}
           style={styles.inputField}
         />
-        <MyButton
-          onPress={onHandleSignUp}
-          title="Login"
-          color={"#6c47ff"}
-          disabled={false}
-        />
+        <MyButton onPress={onHandleSignUp} title="Sign Up" disabled={false} />
 
         <Text style={styles.signupText}>
           Already have an account?{" "}
@@ -77,20 +86,21 @@ const signUpScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Ensures the container takes full screen
+    flex: 1,
     backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
   },
   innerContainer: {
-    width: "100%", // Adjust width for responsiveness
+    width: "100%",
     height: "100%",
     padding: 20,
     paddingTop: 50,
     borderRadius: 10,
-    elevation: 3, // Shadow effect
+    elevation: 3,
     backgroundColor: "#f0f0f0",
   },
   inputField: {
@@ -99,31 +109,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     backgroundColor: "white",
-    elevation: 3, // Shadow effect for Android
-    shadowColor: "black", // Shadow for iOS
+    elevation: 3,
+    shadowColor: "black",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     fontSize: 16,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 40,
-    gap: "15%",
-  },
-  btn: {
-    width: 80,
-    height: 80,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 3, // Shadow effect for Android
-    shadowColor: "#000", // Shadow for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   img: {
     width: "80%",
@@ -131,10 +122,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     alignSelf: "center",
     marginVertical: 50,
-  },
-  icon: {
-    width: 50,
-    height: 50,
   },
   text: {
     fontSize: 25,
@@ -159,8 +146,6 @@ const styles = StyleSheet.create({
   forgot: {
     color: "red",
   },
-  iconButton: {
-    padding: 10,
-  },
 });
-export default signUpScreen;
+
+export default SignUpScreen;
