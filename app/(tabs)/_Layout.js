@@ -39,6 +39,9 @@ const _layout = () => {
             }} />
             <Tabs.Screen
                 name='profile'
+                screenOptions={{ 
+                    headerShown: false 
+                    }}
                 options={{
                     
                     title: "Profile",
