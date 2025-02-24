@@ -23,13 +23,7 @@
       }
     },
     "web": {
-<<<<<<< HEAD
       "favicon": "./assets/favicon.png"
-=======
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
-
->>>>>>> 6df2429c6950b4b90dc199104f993977a4f82d40
     },
     "plugins": [
       "expo-router"
