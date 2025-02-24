@@ -1,13 +1,78 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { Stack } from 'expo-router'
+// import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
+// import { Stack } from "expo-router";
+// import * as SecureStore from "expo-secure-store";
 
-const _layout = () => {
+// // Secure Store for Clerk token caching
+// const tokenCache = {
+//     async getToken(key) {
+//         return SecureStore.getItemAsync(key);
+//     },
+//     async saveToken(key, value) {
+//         return SecureStore.setItemAsync(key, value);
+//     },
+// };
+
+// export default function RootLayout() {
+//     return (
+//         <ClerkProvider
+//             tokenCache={tokenCache}
+//             publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+//         >
+//             <SignedIn>
+//                 {/* If signed in, show main app screens */}
+//                 <Stack screenOptions={{ headerShown: false }}>
+//                     <Stack.Screen name="index" options={{ headerShown: false }} />
+//                 </Stack>
+//             </SignedIn>
+
+//             <SignedOut>
+//                 {/* If signed out, show auth screens */}
+//                 <Stack screenOptions={{ headerShown: false }}>
+//                     <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+//                     <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+//                 </Stack>
+//             </SignedOut>
+//         </ClerkProvider>
+//     );
+// }
+
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { useAuth } from "@clerk/clerk-expo";
+import { Slot, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { useEffect } from "react";
+
+export default function RootLayout() {
+  const tokenCache = {
+    async getToken(key) {
+      return SecureStore.getItemAsync(key);
+    },
+    async saveToken(key, value) {
+      return SecureStore.setItemAsync(key, value);
+    },
+  };
+
   return (
-    <Stack/>
-  )
+    <ClerkProvider
+      tokenCache={tokenCache}
+      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    >
+      <AuthWrapper />
+    </ClerkProvider>
+  );
 }
 
-export default _layout
+function AuthWrapper() {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
 
-const styles = StyleSheet.create({})
+  useEffect(() => {
+    if (isSignedIn === false) {
+      router.replace("/(auth)/sign-in");
+    } else if (isSignedIn === true) {
+      router.replace("/home");
+    }
+  }, [isSignedIn]);
+
+  return <Slot />; // Ensures the index.js (splash screen) is rendered first
+}
