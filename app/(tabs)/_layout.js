@@ -1,16 +1,53 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import SignOutButton from '../../components/SignOutButton'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { Tabs } from "expo-router";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import colors from "../../colors/colors";
 
 const _Layout = () => {
   return (
-    <View>
-      <Text>_Layout</Text>
-      <SignOutButton/>
-    </View>
-  )
-}
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: colors.BLUE,
+        tabBarInactiveTintColor: colors.GRAY,
+        tabBarHideOnKeyboard: true,
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="home"
+        options={{
+          headerShown: false,
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: "Explore",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="compass" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="user-alt" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+};
 
-export default _Layout
+export default _Layout;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

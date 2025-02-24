@@ -42,6 +42,7 @@ import { Slot, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect } from "react";
 
+
 export default function RootLayout() {
   const tokenCache = {
     async getToken(key) {
