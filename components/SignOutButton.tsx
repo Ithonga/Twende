@@ -1,34 +1,34 @@
-import { View, Text, Pressable, Alert } from "react-native";
-import { useRouter } from "expo-router";
-import { auth } from "../firebaseConfig";
-import { signOut } from "firebase/auth";
+// app/home.js
+import React from 'react';
+import { View, Text, Alert } from 'react-native';
+import { useAuth } from '@clerk/clerk-expo';
+import { useRouter } from 'expo-router';
+import MyButton from '../components/MyButton'; // Your custom button component
 
-export default function SignOutButton() {
+const HomeScreen = () => {
+  const { isLoaded, signOut } = useAuth();
   const router = useRouter();
 
-  const handleSignOut = () => {
-    signOut(auth)
-      .then(() => {
-        Alert.alert("Signed Out", "You have been signed out successfully.");
-        router.replace("/loginScreen"); // Redirect to login screen
-      })
-      .catch((error) => Alert.alert("Error", error.message));
+  const handleSignOut = async () => {
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      await signOut();
+      Alert.alert('Signed Out', 'You have been successfully signed out.');
+      router.replace('/sign-in'); // Redirect to the login page
+    } catch (err) {
+      Alert.alert('Error', 'Failed to sign out. Please try again.');
+      console.error('Sign-out error:', err);
+    }
   };
 
   return (
-    <View style={{ padding: 20, alignItems: "center" }}>
-      <Pressable
-        onPress={handleSignOut}
-        style={{
-          backgroundColor: "red",
-          padding: 10,
-          borderRadius: 8,
-          alignItems: "center",
-          width: 150,
-        }}
-      >
-        <Text style={{ color: "white", fontWeight: "bold" }}>Sign Out</Text>
-      </Pressable>
+    <View style={{  justifyContent: 'center', alignItems: 'center' }}>
+      <MyButton onPress={handleSignOut} title="Sign Out" color="red" disabled={undefined} />
     </View>
   );
-}
+};
+
+export default HomeScreen;
