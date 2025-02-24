@@ -4,7 +4,7 @@ import { View, TextInput, FlatList, Text, Image, StyleSheet } from "react-native
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   // Filter destinations based on search query
-  
+
   return (
     <View style={styles.container}>
       {/* Search Input */}
@@ -14,18 +14,14 @@ const App = () => {
         value={searchQuery}
         onChangeText={(text) => setSearchQuery(text)}
       />
-
-      {/* Show Results Only When Search Query Exists */}
-      
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: 20,
-    backgroundColor: "#f5f5f5",
+    padding: 10,
+    backgroundColor: "",
   },
   searchBar: {
     height: 50,

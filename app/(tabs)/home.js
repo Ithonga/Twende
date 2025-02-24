@@ -1,14 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Search from "../../components/Search";
+import Header from "../../components/Header";
 
 const home = () => {
   return (
-    <View>
-      <Text>home</Text>
-    </View>
-  )
-}
+    <SafeAreaView style={styles.container}>
+      <View>
+        {/* Header */}
+        <Header title="Discover" />
+        {/* Search Bar */}
+        <Search />
+        {/* Content */}
+        <View>
+          <Text>Categories</Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
 
-export default home
+export default home;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+});
