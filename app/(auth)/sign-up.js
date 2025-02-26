@@ -24,8 +24,8 @@ export default function SignUpScreen() {
   const { isSignedIn } = useAuth();
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
-  // const [firstName, setFirstName] = React.useState('')
-  // const [lastName, setLastName] = React.useState('')
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [pendingVerification, setPendingVerification] = React.useState(false);
@@ -55,8 +55,8 @@ export default function SignUpScreen() {
     try {
       //this are the fields i have accepted in the clerk app (ways of authentication)
       await signUp.create({
-        // firstName,
-        // lastName,
+        firstName,
+        lastName,
         emailAddress,
         password,
       });
@@ -117,12 +117,15 @@ export default function SignUpScreen() {
   const onGoogleSignIn = async () => {
     try {
       const { createdSessionId, signIn, signUp } = await startOAuthFlow();
-  
+
       if (createdSessionId) {
         await setActive({ session: createdSessionId });
         router.replace("/home"); // Redirect to home after successful sign-in
       } else {
-        Alert.alert("Sign-In Failed", "Something went wrong. Please try again.");
+        Alert.alert(
+          "Sign-In Failed",
+          "Something went wrong. Please try again."
+        );
       }
     } catch (err) {
       console.error("Google Sign-In Error:", err);
@@ -170,20 +173,22 @@ export default function SignUpScreen() {
         <>
           <Image source={require("../../assets/Logo.png")} style={styles.img} />
           <Text style={styles.text}>Create your Account</Text>
-          {/* <TextInput
-                  autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
-                  value={firstName}
-                  placeholder="Enter first name"
-                  onChangeText={(name) => setFirstName(name)}
-                  style={styles.inputField}     
-              />
-              <TextInput
-                  autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
-                  value={lastName}
-                  placeholder="Enter last name"
-                  onChangeText={(name) => setLastName(name)}
-                  style={styles.inputField}
-              /> */}
+          <TextInput
+            autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
+            value={firstName}
+            placeholder="Enter first name"
+            placeholderTextColor="#888"
+            onChangeText={(name) => setFirstName(name)}
+            style={styles.inputField}
+          />
+          <TextInput
+            autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
+            value={lastName}
+            placeholder="Enter last name"
+            placeholderTextColor="#888"
+            onChangeText={(name) => setLastName(name)}
+            style={styles.inputField}
+          />
           <TextInput
             autoCapitalize="none"
             value={emailAddress}

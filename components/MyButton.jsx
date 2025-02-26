@@ -8,7 +8,7 @@ const MyButton = ({ onPress, title, color, disabled }) => {
       onPress={disabled ? null : onPress} // Disable onPress if the button is disabled
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: disabled ? '#cccccc' : colors.BLUE }, // Change color when disabled
+        { backgroundColor: disabled ? '#cccccc' : color }, // Change color when disabled
         pressed && !disabled && styles.buttonPressed, // Apply pressed style only if not disabled
       ]}
       disabled={disabled} // Pass the disabled prop to Pressable

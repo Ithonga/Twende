@@ -1,47 +1,67 @@
-import { View, Text, TextInput, Image, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import { Link, router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useUser } from "@clerk/clerk-expo";
+import colors from "../colors/colors";
+import { useState } from "react";
+
 
 export default function EditProfileScreen() {
+  const { user } = useUser();
+  const [name, setName] = useState(user?.firstName);
+  const [email, setEmail] = useState(user?.email);
+  const [Password, setPassword] = useState("");
+
   return (
-    <View className="flex-1 bg-white p-6">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="flex-row justify-between items-center mb-6">
-        <Link href="/profile" asChild>
-          <TouchableOpacity>
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-        </Link>
-        <Text className="text-xl font-semibold">Edit Profile</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headertext}>Edit Profile</Text>
         <Ionicons name="checkmark" size={24} color="green" />
       </View>
 
       {/* Profile Picture */}
       <View className="items-center mb-6">
         <Image
-          source={{ uri: 'https://via.placeholder.com/100' }}
-          className="w-24 h-24 rounded-full"
+          source={
+            user?.imageUrl
+              ? { uri: user.imageUrl }
+              : require("../assets/user.jpg")
+          }
+          style={styles.profileImage}
         />
-        <TouchableOpacity className="absolute bottom-0 right-12 bg-gray-200 p-2 rounded-full">
+        <TouchableOpacity style={styles.cameraicon}>
+        
           <Ionicons name="camera" size={18} color="black" />
         </TouchableOpacity>
       </View>
 
       {/* Input Fields */}
       {[
-        { label: 'Name', value: 'Charlotte King' },
-        { label: 'E-mail Address', value: 'johnkinggraphics@gmail.com' },
-        { label: 'User Name', value: '@johnkinggraphics' },
-        { label: 'Password', value: '********', isPassword: true },
-        { label: 'Phone Number', value: '+91 6895312' },
+        { label: "Name", value:{setName} },
+        { label: "E-mail Address", value: {setEmail} },
+        { label: "User Name", value: "@johnkinggraphics" },
+        { label: "Password", value: {setPassword}, isPassword: true },
+        { label: "Phone Number", value: "+91 6895312" },
       ].map((item, index) => (
-        <View key={index} className="mb-4">
-          <Text className="text-gray-600">{item.label}</Text>
-          <View className="flex-row items-center border border-gray-300 rounded-lg p-3">
+        <View key={index} style={styles.inputContainer}>
+          <Text style={styles.label}>{item.label}</Text>
+          <View style={styles.input}>
             <TextInput
+              placeholderTextColor={colors.GRAY}
               value={item.value}
               secureTextEntry={item.isPassword}
-              className="flex-1 text-gray-800"
+              style={styles.inputField}
               editable={!item.isPassword}
             />
             {item.isPassword && (
@@ -53,3 +73,65 @@ export default function EditProfileScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 20,
+    margin: 10,
+  },
+  headertext: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "black",
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  cameraicon: {
+    position: "absolute",
+    right: 12,
+    bottom: 12,
+    backgroundColor: "white",
+    borderRadius: 50,
+    padding: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: colors.PRIMARY,
+  },
+  input: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.GRAY,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  inputField: {
+    flex: 1,
+    marginLeft: 10,
+  },
+});

@@ -38,7 +38,7 @@
 
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
-import { Slot, useRouter } from "expo-router";
+import { Slot, Stack, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect } from "react";
 
@@ -75,5 +75,11 @@ function AuthWrapper() {
     }
   }, [isSignedIn]);
 
-  return <Slot />; // Ensures the index.js (splash screen) is rendered first
+  return (
+  <Stack screenOptions={{ headerShown: false }} >
+    <Stack.Screen name="index" options={{ headerShown: false }} />
+    <Stack.Screen name="edit-profile" options={{ presentation: "modal" }} />
+    <Stack.Screen name="settings" options={{ presentation: "modal" }} />
+  </Stack>
+  ); // Ensures the index.js (splash screen) is rendered first
 }

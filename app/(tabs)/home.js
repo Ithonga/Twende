@@ -3,6 +3,8 @@ import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Search from "../../components/Search";
 import Header from "../../components/Header";
+import ShareButton from "../../components/ShareButton";
+import ParallaxCorousel from "../../components/corouselComponents/ParallaxCorousel";
 
 const home = () => {
   return (
@@ -13,8 +15,12 @@ const home = () => {
         {/* Search Bar */}
         <Search />
         {/* Content */}
+        <ParallaxCorousel />
+
         <View>
           <Text>Categories</Text>
+
+          <ShareButton/>
         </View>
       </View>
     </SafeAreaView>
