@@ -80,6 +80,7 @@ function AuthWrapper() {
     <Stack.Screen name="index" options={{ headerShown: false }} />
     <Stack.Screen name="edit-profile" options={{ presentation: "modal" }} />
     <Stack.Screen name="settings" options={{ presentation: "modal" }} />
+    <Stack.Screen name="tourCard" options={{ presentation: "modal" }} />
   </Stack>
   ); // Ensures the index.js (splash screen) is rendered first
 }

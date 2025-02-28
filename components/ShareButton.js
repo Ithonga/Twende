@@ -1,26 +1,44 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
+import { View, Text, TouchableOpacity, Share } from "react-native";
+import colors from "../colors/colors";
 
-const ShareButton = () => {
-  const handleShare = async () => {
+const ShareApp = () => {
+  const onShare = async () => {
     try {
-      await Share.share({
-        message: "sharing method",
-        url: "https://www.google.com",
+      const result = await Share.share({
+        message:
+          "Check out this amazing tours and travel app for Kenya! 🌍✨\nDownload it now: https://expo.dev/accounts/ithonga/projects/Twende/builds/1a832844-ef3c-4a6d-ba93-3f41cbdbf9ee",
       });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log("Shared with activity type:", result.activityType);
+        } else {
+          console.log("Shared successfully");
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share dismissed");
+      }
     } catch (error) {
-      Alert.alert("Error", "Failed to share. Please try again.");
+      console.error("Error sharing:", error.message);
     }
   };
+
   return (
-    <View>
-      <TouchableOpacity onPress={handleShare}>
-        <Text style={{ color: "white" , backgroundColor:"blue", padding:10, alignSelf:"baseline", borderRadius:50}}>Share</Text>
+    <View style={{ alignItems: "center", padding: 20 }}>
+      <TouchableOpacity
+        onPress={onShare}
+        style={{
+          backgroundColor:colors.BLUE,
+          padding: 10,
+          borderRadius: 8,
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: 16 }}>Share This App</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export default ShareButton;
-
-const styles = StyleSheet.create({});
+export default ShareApp;

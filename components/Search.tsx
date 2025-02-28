@@ -20,7 +20,7 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    paddingTop: 10,
     backgroundColor: "",
   },
   searchBar: {
