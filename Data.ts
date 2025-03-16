@@ -8,8 +8,10 @@ export const CATEGORIES = [
         name: "Diani Beach Getaway",
         imageUrl: require("./assets/diani.jpg"),
         price: 15000,
+        rate: 4.5,
+        joined: 10,
         description:
-          "Relax on the white sandy beaches of Diani with breathtaking ocean views.",
+          "Escape to Diani Beach, Kenya’s premier coastal paradise, where white sandy beaches, swaying palms, and turquoise waters create the perfect tropical retreat. Relax under the sun, sip fresh coconut water, or dive into adventure with kitesurfing, snorkeling, and scuba diving in vibrant coral reefs. Explore beyond the shore with a safari at Shimba Hills, a dhow cruise to Wasini Island, or a visit to the mystical Kaya Kinondo Forest. Indulge in luxury beachfront resorts, fresh seafood, and Swahili cuisine, then unwind with stunning sunsets and lively beach nightlife. Whether you seek relaxation, adventure, or romance, Diani Beach offers an unforgettable getaway. ",
       },
       {
         id: "102",

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, TextInput, StyleSheet, Textrr } from "react-native";
+import { View, TextInput, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import colors from "../colors/colors";
 
 const OTPInput = ({ length = 6, onComplete }) => {
@@ -30,7 +30,9 @@ const OTPInput = ({ length = 6, onComplete }) => {
   };
 
   return (
-    <View style={styles.otpContainer}>
+    <SafeAreaView>
+      <ScrollView>
+      <View style={styles.otpContainer}>
       {otp.map((digit, index) => (
         <TextInput
           key={index}
@@ -44,6 +46,8 @@ const OTPInput = ({ length = 6, onComplete }) => {
         />
       ))}
     </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -56,13 +60,13 @@ const styles = StyleSheet.create({
   otpBox: {
     width: 50,
     height: 50,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.BLUE,
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
     marginHorizontal: 5,
-    borderRadius: 8,
+    borderRadius: 10,
   },
 });
 

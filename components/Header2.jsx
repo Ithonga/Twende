@@ -9,12 +9,12 @@ const Header2 = ({ title }) => {
     <View style={styles.header}>
       <Ionicons name="arrow-back" size={24} color="black" onPress={() => router.back()}/>
       <Text style={styles.headertext}>{title}</Text>
-      <MaterialIcons
+      {/* <MaterialIcons
         name="settings-suggest"
         size={30}
         color="black"
         onPress={() => router.push("/settings")}
-      />
+      /> */}
     </View>
   );
 };
@@ -24,10 +24,11 @@ export default Header2;
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
     marginBottom: 10,
     margin: 20,
+    gap: 10
   },
   headertext: {
     fontSize: 25,

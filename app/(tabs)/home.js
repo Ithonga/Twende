@@ -25,8 +25,7 @@ const Home = () => {
         {/* Header */}
         <Header title="Discover" />
 
-        {/* Search Bar */}
-        <Search />
+       
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -78,16 +77,15 @@ const Home = () => {
                   {CATEGORIES[activeCategory].tours &&
                   CATEGORIES[activeCategory].tours.length > 0 ? (
                     CATEGORIES[activeCategory].tours.map((tour) => (
-                      <TouchableOpacity key={tour.id} onPress={() => router.push(`/tour/${tour.id}`)}>
-
+                      <TouchableOpacity
+                        key={tour.id}
+                        onPress={() => router.push(`/tour/${tour.id}`)}
+                      >
                         <View style={styles.tourCard}>
-                          <Image
-                            source={tour.imageUrl}
-                            style={styles.image}
-                          />
+                          <Image source={tour.imageUrl} style={styles.image} />
                           <Text style={styles.tourName}>{tour.name}</Text>
                           <Text style={styles.price}>From ${tour.price}</Text>
-                          <Text style={styles.description}>
+                          <Text ellipsizeMode="tail" numberOfLines={2} style={styles.description}>
                             {tour.description}
                           </Text>
                         </View>
@@ -102,9 +100,6 @@ const Home = () => {
               <Text style={styles.noToursText}>Category not found</Text>
             )}
           </View>
-
-          {/* Share Button */}
-          <ShareButton />
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -128,7 +123,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     padding: 10,
-    marginVertical: 5,
+    margin: 5,
     marginRight: 10,
     borderRadius: 10,
     backgroundColor: "#fff",
@@ -177,6 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555",
     textAlign: "center",
+    padding: 10,
   },
   noToursText: {
     textAlign: "center",

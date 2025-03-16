@@ -29,13 +29,13 @@ const ShareApp = () => {
       <TouchableOpacity
         onPress={onShare}
         style={{
-          backgroundColor:colors.BLUE,
+          backgroundColor:"red",
           padding: 10,
           borderRadius: 8,
           alignItems: "center",
         }}
       >
-        <Text style={{ color: "#fff", fontSize: 16 }}>Share This App</Text>
+        <Text style={{ color: "#fff", fontSize: 16 }}>Share</Text>
       </TouchableOpacity>
     </View>
   );

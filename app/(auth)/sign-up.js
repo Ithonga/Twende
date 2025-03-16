@@ -2,7 +2,7 @@ import * as React from "react";
 import {
   Text,
   TextInput,
-  Button,
+  SafeAreaView,
   View,
   StyleSheet,
   Alert,
@@ -10,6 +10,8 @@ import {
   Pressable,
   Image,
   TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useAuth, useSignUp } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
@@ -19,6 +21,7 @@ import Spinner from "react-native-loading-spinner-overlay";
 import { Ionicons } from "@expo/vector-icons";
 import OTPInput from "../../components/OTPinput";
 import { useOAuth } from "@clerk/clerk-expo";
+import colors from "../../colors/colors";
 
 export default function SignUpScreen() {
   const { isSignedIn } = useAuth();
@@ -42,35 +45,44 @@ export default function SignUpScreen() {
   // Handle submission of sign-up form
   const onSignUpPress = async () => {
     if (!isLoaded) return;
-
+  
     if (password !== showConfirmPassword) {
-      Alert.alert(
-        "Password Mismatch",
-        "Passwords do not match. Please try again."
-      );
+      Alert.alert("Password Mismatch", "Passwords do not match. Please try again.");
       return;
     }
 
-    // Start sign-up process using firstName, lastName, email and password provided
+    if (isSignedIn) {
+      await signOut(); // Ensure the user is signed out before starting a new sign-up
+    }
+  
     try {
-      //this are the fields i have accepted in the clerk app (ways of authentication)
+      // Start sign-up process
       await signUp.create({
         firstName,
         lastName,
         emailAddress,
         password,
       });
-
-      // Send user an email with verification code
+  
+      // Send verification email
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // Set 'pendingVerification' to true to display second form
-      // and capture OTP code
+  
       setPendingVerification(true);
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error("Sign-Up Error:", err);
+  
+      if (err.errors && err.errors[0]?.code === "form_identifier_exists") {
+        Alert.alert(
+          "Account Exists",
+          "An account with this email already exists. Please log in instead."
+        );
+        router.replace("/sign-in");
+      } else {
+        Alert.alert("Sign-Up Failed", "An error occurred. Please try again.");
+      }
     }
   };
+  
 
   const onVerifyPress = async () => {
     if (!isLoaded || isVerifying) return; // Prevent multiple presses while verifying
@@ -114,24 +126,34 @@ export default function SignUpScreen() {
 
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
-  const onGoogleSignIn = async () => {
+  const onGoogleSignUp = async () => {
     try {
-      const { createdSessionId, signIn, signUp } = await startOAuthFlow();
-
-      if (createdSessionId) {
+      const { createdSessionId, signUp, signIn } = await startOAuthFlow();
+  
+      if (signIn) {
+        Alert.alert(
+          "Account Already Exists",
+          "You already have an account. Redirecting to login."
+        );
+        router.replace("/sign-in");
+        return;
+      }
+  
+      if (signUp && createdSessionId) {
         await setActive({ session: createdSessionId });
-        router.replace("/home"); // Redirect to home after successful sign-in
+        router.replace("/home");
       } else {
         Alert.alert(
-          "Sign-In Failed",
-          "Something went wrong. Please try again."
+          "Sign-Up Failed",
+          "Could not complete sign-up. Try using a different method."
         );
       }
     } catch (err) {
-      console.error("Google Sign-In Error:", err);
-      Alert.alert("Error", "Could not sign in with Google. Please try again.");
+      console.error("Google Sign-Up Error:", err);
+      Alert.alert("Error", "Could not sign up with Google. Please try again.");
     }
   };
+  
 
   // State to track the verification process
   const [isVerifying, setIsVerifying] = useState(false);
@@ -139,111 +161,137 @@ export default function SignUpScreen() {
   if (pendingVerification) {
     return (
       <>
-        <View style={styles.container}>
-          <Spinner visible={loading} />
-          <Image source={require("../../assets/Logo.png")} style={styles.img} />
-
-          <Text style={styles.text}>Verify your email</Text>
-          <OTPInput
-            length={6} // Adjust OTP length if needed
-            onComplete={(code) => setCode(code)} // Update code state when complete
-          />
-
-          {isVerifying ? (
-            <ActivityIndicator size="large" color="#6c47ff" />
-          ) : (
-            <>
-              <MyButton
-                onPress={onVerifyPress}
-                title="Verify"
-                color={"#6c47ff"}
-                disabled={isVerifying}
+        <SafeAreaView>
+          <ScrollView>
+            <View style={styles.innerContainer}>
+              <Spinner visible={loading} />
+              <Image
+                source={require("../../assets/Logo.png")}
+                style={styles.img}
               />
-            </>
-          )}
-        </View>
+
+              <Text style={styles.text}>Verify your email</Text>
+              <OTPInput
+                length={6} // Adjust OTP length if needed
+                onComplete={(code) => setCode(code)} // Update code state when complete
+              />
+
+              {isVerifying ? (
+                <ActivityIndicator size="large" color={colors.BLUE} />
+              ) : (
+                <>
+                  <MyButton
+                    onPress={onVerifyPress}
+                    title="Verify"
+                    color={colors.BLUE}
+                    disabled={isVerifying}
+                  />
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
       </>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Spinner visible={loading} />
-      <View style={styles.innerContainer}>
-        <>
-          <Image source={require("../../assets/Logo.png")} style={styles.img} />
-          <Text style={styles.text}>Create your Account</Text>
-          <TextInput
-            autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
-            value={firstName}
-            placeholder="Enter first name"
-            placeholderTextColor="#888"
-            onChangeText={(name) => setFirstName(name)}
-            style={styles.inputField}
-          />
-          <TextInput
-            autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
-            value={lastName}
-            placeholder="Enter last name"
-            placeholderTextColor="#888"
-            onChangeText={(name) => setLastName(name)}
-            style={styles.inputField}
-          />
-          <TextInput
-            autoCapitalize="none"
-            value={emailAddress}
-            placeholder="Enter email"
-            placeholderTextColor="#888"
-            onChangeText={(email) => setEmailAddress(email)}
-            style={styles.inputField}
-          />
+    <SafeAreaView >
+      <KeyboardAvoidingView
+        behavior="padding"
+      >
+        <ScrollView bounces={false}>
+          <View style={styles.container}>
+            <Spinner visible={loading} />
+            <View style={styles.innerContainer}>
+              <>
+                <Image
+                  source={require("../../assets/Logo.png")}
+                  style={styles.img}
+                />
+                <Text style={styles.text}>Create your Account</Text>
+                <TextInput
+                  autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
+                  value={firstName}
+                  placeholder="Enter first name"
+                  placeholderTextColor="#888"
+                  onChangeText={(name) => setFirstName(name)}
+                  style={styles.inputField}
+                />
+                <TextInput
+                  autoCapitalize="words" // Capitalize the first letter of each word, which is common for names
+                  value={lastName}
+                  placeholder="Enter last name"
+                  keyboardType="default"
+                  placeholderTextColor="#888"
+                  onChangeText={(name) => setLastName(name)}
+                  style={styles.inputField}
+                />
+                <TextInput
+                  autoCapitalize="none"
+                  value={emailAddress}
+                  placeholder="Enter email"
+                  keyboardType="email-address"
+                  placeholderTextColor="#888"
+                  onChangeText={(email) => setEmailAddress(email)}
+                  style={styles.inputField}
+                />
 
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor="#888"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            style={styles.inputField}
-          />
-          <TextInput
-            value={showConfirmPassword}
-            placeholderTextColor="#888"
-            placeholder="Confirm password"
-            secureTextEntry={!showPassword}
-            onChangeText={setShowConfirmPassword}
-            style={styles.inputField}
-          />
-          <Pressable onPress={toggleShowPassword} style={styles.iconButton}>
-            <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
-              size={24}
-              color="#6c47ff"
-            />
-          </Pressable>
+                <TextInput
+                  placeholder="Password"
+                  placeholderTextColor="#888"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  style={styles.inputField}
+                />
+                <TextInput
+                  value={showConfirmPassword}
+                  placeholderTextColor="#888"
+                  placeholder="Confirm password"
+                  secureTextEntry={!showPassword}
+                  onChangeText={setShowConfirmPassword}
+                  style={styles.inputField}
+                />
+                <Pressable
+                  onPress={toggleShowPassword}
+                  style={styles.iconButton}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off" : "eye"}
+                    size={24}
+                    color="#6c47ff"
+                  />
+                </Pressable>
 
-          <MyButton
-            onPress={onSignUpPress}
-            title="Continue"
-            color={"#6c47ff"}
-            disabled={undefined}
-          ></MyButton>
+                <MyButton
+                  onPress={onSignUpPress}
+                  title="Continue"
+                  color={colors.BLUE}
+                  disabled={undefined}
+                ></MyButton>
 
-          <Text style={styles.signupText}>
-            Already have an account?{" "}
-            <Link href="/sign-in">
-              <Text style={styles.signupLink}>Sign In</Text>
-            </Link>
-          </Text>
-          <TouchableOpacity onPress={onGoogleSignIn} style={styles.btn}>
-            <Image
-              source={require("../../assets/Logo.png")}
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        </>
-      </View>
-    </View>
+                <Text style={styles.signupText}>
+                  Already have an account?{" "}
+                  <TouchableOpacity onPress={() => router.replace("/sign-in")}>
+                    <Text style={styles.signupLink}>Login</Text>
+                  </TouchableOpacity>
+                </Text>
+                <Text style={styles.signupText}>- Or sign up with -</Text>
+
+                <TouchableOpacity onPress={onGoogleSignUp} style={styles.btn}>
+                  <Image
+                    source={require("../../assets/google.webp")}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.btntext}>Sign up with Google</Text>
+                </TouchableOpacity>
+              </>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -257,11 +305,10 @@ const styles = StyleSheet.create({
   innerContainer: {
     width: "100%", // Adjust width for responsiveness
     height: "100%",
-    padding: 20,
-    paddingTop: 50,
-    borderRadius: 10,
-    elevation: 3, // Shadow effect
+    paddingHorizontal: 20,
     backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    
   },
 
   inputField: {
@@ -285,7 +332,7 @@ const styles = StyleSheet.create({
     height: 70,
     resizeMode: "contain",
     alignSelf: "center",
-    marginVertical: 50,
+    margin: 20,
   },
   text: {
     fontSize: 25,
@@ -297,6 +344,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555",
     textAlign: "center",
+    margin:8
   },
   signupLink: {
     color: "#007bff",
@@ -309,12 +357,15 @@ const styles = StyleSheet.create({
     gap: "15%",
   },
   btn: {
-    width: 80,
-    height: 80,
+    width: "60%",
+    height: 40,
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 50,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
+    alignSelf: "center",
+    margin: 10,
+    flexDirection: "row",
     elevation: 3, // Shadow effect for Android
     shadowColor: "#000", // Shadow for iOS
     shadowOffset: { width: 0, height: 2 },
@@ -322,8 +373,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   icon: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
   },
   passwordInput: {
     flex: 1,

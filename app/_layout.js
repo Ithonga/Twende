@@ -40,8 +40,8 @@ import { ClerkProvider } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
 import { Slot, Stack, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-
 
 export default function RootLayout() {
   const tokenCache = {
@@ -76,11 +76,13 @@ function AuthWrapper() {
   }, [isSignedIn]);
 
   return (
-  <Stack screenOptions={{ headerShown: false }} >
-    <Stack.Screen name="index" options={{ headerShown: false }} />
-    <Stack.Screen name="edit-profile" options={{ presentation: "modal" }} />
-    <Stack.Screen name="settings" options={{ presentation: "modal" }} />
-    <Stack.Screen name="tourCard" options={{ presentation: "modal" }} />
-  </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="edit-profile" options={{ presentation: "modal" }} />
+        <Stack.Screen name="settings" options={{ presentation: "modal" }} />
+      </Stack>
+      <StatusBar style="auto" />
+    </>
   ); // Ensures the index.js (splash screen) is rendered first
 }

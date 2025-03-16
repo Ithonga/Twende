@@ -1,9 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-import Entypo from "@expo/vector-icons/Entypo";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import colors from "../../colors/colors";
 
 const _Layout = () => {

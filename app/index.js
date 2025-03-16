@@ -3,10 +3,22 @@ import { View, Text, ActivityIndicator, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import Colors from "../colors/colors";
 import { useAuth } from "@clerk/clerk-expo";
+import * as Updates from "expo-updates";
 
 export default function SplashScreen() {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth(); // Ensure authentication is loaded
+  const {
+    
+    isUpdatePending
+  } = Updates.useUpdates();
+
+  useEffect(() => {
+    if (isUpdatePending) {
+      // Update has successfully downloaded; apply it now
+      Updates.reloadAsync();
+    }
+  }, [isUpdatePending]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -38,6 +50,7 @@ export default function SplashScreen() {
           style={{ height: 30, resizeMode: "contain" }}
         />
       </View>
+      
     </View>
   );
 }

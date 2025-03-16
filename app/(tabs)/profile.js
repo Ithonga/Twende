@@ -4,22 +4,76 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import colors from "../../colors/colors";
 import { ScrollView } from "react-native";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import SignOutButton from "../../components/SignOutButton";
 import ShareButton from "../../components/ShareButton";
 import { router } from "expo-router";
+import UpdatesDemo from "../../components/UpdatesDemo";
+import DeleteAccountButton from "../../components/DeleteUser";
 
 export default function ProfileScreen() {
   const { user } = useUser();
+  const { signOut, isLoaded } = useAuth();
 
   const menuitems = [
-    { name: "Favourites", route: "/profileScreens/Favourites" },
-    { name: "Downloads", route: "/profileScreens/Downloads" },
-    { name: "Language", route: "/profileScreens/Language" },
-    { name: "Location", route: "/profileScreens/Location" },
-    { name: "About", route: "/profileScreens/About" },
-    { name: "Feedback", route: "/profileScreens/Feedback" },
+    {
+      name: "Favourites",
+      route: "/profileScreens/Favourites",
+      Ionicons: "heart",
+    },
+    {
+      name: "Downloads",
+      route: "/profileScreens/Downloads",
+      Ionicons: "download-outline",
+    },
+    // { name: "Language", route: "/profileScreens/Language" , Ionicons: "language" },
+    // { name: "Location", route: "/profileScreens/Location" , Ionicons: "location" },
+    { name: "About", route: "/profileScreens/About", Ionicons: "person" },
+    {
+      name: "Feedback",
+      route: "/profileScreens/Feedback",
+      Ionicons: "chatbubbles",
+    },
   ];
+
+  const handleSignOut = async () => {
+    if (!isLoaded) {
+      return;
+    }
+
+    try {
+      await signOut();
+      Alert.alert("Signed Out", "You have been successfully signed out.");
+      router.replace("/sign-in"); // Redirect to the login page
+    } catch (err) {
+      Alert.alert("Error", "Failed to sign out. Please try again.");
+      console.error("Sign-out error:", err);
+    }
+  };
+
+  // Function to get initials from second and last name
+  const getInitials = (fullName) => {
+    if (!fullName) return "U"; // Default initial if no name
+    const nameParts = fullName.trim().split(" ");
+    if (nameParts.length < 2) return nameParts[0][0].toUpperCase(); // If only one name, take first letter
+    const secondName = nameParts[1][0].toUpperCase();
+    const lastName =
+      nameParts.length > 2
+        ? nameParts[nameParts.length - 1][0].toUpperCase()
+        : "";
+    return secondName + lastName;
+  };
+
+  // Handle case where user is null
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.profileInfo}>
+          <Text style={styles.profileName}>Loading user...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -28,7 +82,12 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           {/* <Ionicons name="arrow-back" size={24} color="black" /> */}
           <Text style={styles.headertext}>My Profile</Text>
-          <MaterialIcons name="settings-suggest" size={30} color="black" onPress={() => router.push("/settings")}/>
+          <MaterialIcons
+            name="settings-suggest"
+            size={30}
+            color="black"
+            onPress={() => router.push("/settings")}
+          />
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -36,7 +95,7 @@ export default function ProfileScreen() {
           bounces={false}
         >
           {/* Profile Info */}
-          <View style={styles.profileInfo}>
+          {/* <View style={styles.profileInfo}>
             <Image
               source={
                 user?.imageUrl
@@ -44,7 +103,20 @@ export default function ProfileScreen() {
                   : require("../../assets/user.jpg")
               }
               style={styles.profileImage}
-            />
+            /> */}
+          <View style={styles.profileInfo}>
+            {user.imageUrl ? (
+              <Image
+                source={{ uri: user.imageUrl }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <View style={styles.initialsContainer}>
+                <Text style={styles.initialsText}>
+                  {getInitials(user.fullName)}
+                </Text>
+              </View>
+            )}
             <View style={styles.profileDetails}>
               <Text style={styles.profileName}>{user.fullName}.</Text>
               <Text style={styles.profileEmail}>
@@ -67,8 +139,11 @@ export default function ProfileScreen() {
                 style={styles.menuitem}
                 onPress={() => router.push(item.route)} // Use router.push to navigate
               >
-                <Text style={styles.menuitemtext}>{item.name}</Text>
-                <Ionicons name="chevron-forward" size={20} color="gray" />
+                <View style={styles.menuitemcontainer}>
+                  <Ionicons name={item.Ionicons} size={20} color="black" />
+                  <Text style={styles.menuitemtext}>{item.name}</Text>
+                  <Ionicons name="chevron-forward" size={20} color="gray" />
+                </View>
               </TouchableOpacity>
             ))}
             {/* {[
@@ -85,12 +160,13 @@ export default function ProfileScreen() {
             ))} */}
 
             {/* Logout */}
-            <TouchableOpacity className="flex-row items-center py-3">
-              <Text className="text-red-500 text-lg flex-1">Log out</Text>
+            <TouchableOpacity style={styles.logout} onPress={handleSignOut}>
+              <Text style={styles.logouttext}>Log out</Text>
               <Ionicons name="log-out-outline" size={20} color="red" />
             </TouchableOpacity>
-            <SignOutButton color="red" />
+            <UpdatesDemo />
             <ShareButton />
+            <DeleteAccountButton />
           </View>
         </ScrollView>
       </View>
@@ -99,6 +175,18 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  menuitemcontainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    height: 60,
+    width: "100%",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
   container: {
     flex: 1,
     padding: 10,
@@ -159,13 +247,42 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.GRAY,
+    // borderBottomWidth: 1,
+    // borderBottomColor: colors.GRAY,
   },
   menuitemtext: {
     flex: 1,
     color: colors.PRIMARY,
     fontSize: 16,
     marginLeft: 10,
+    // backgroundColor: "red",
+    padding: 10,
+  },
+  logout: {
+    height: 70,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.GRAY,
+  },
+  logouttext: {
+    flex: 1,
+    color: "red",
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  initialsContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#ccc", // Placeholder color
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  initialsText: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
   },
 });

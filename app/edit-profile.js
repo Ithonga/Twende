@@ -5,13 +5,13 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 import { Link, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useUser } from "@clerk/clerk-expo";
 import colors from "../colors/colors";
 import { useState } from "react";
-
 
 export default function EditProfileScreen() {
   const { user } = useUser();
@@ -20,64 +20,64 @@ export default function EditProfileScreen() {
   const [Password, setPassword] = useState("");
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headertext}>Edit Profile</Text>
-        <Ionicons name="checkmark" size={24} color="green" />
-      </View>
-
-      {/* Profile Picture */}
-      <View className="items-center mb-6">
-        <Image
-          source={
-            user?.imageUrl
-              ? { uri: user.imageUrl }
-              : require("../assets/user.jpg")
-          }
-          style={styles.profileImage}
-        />
-        <TouchableOpacity style={styles.cameraicon}>
-        
-          <Ionicons name="camera" size={18} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Input Fields */}
-      {[
-        { label: "Name", value:{setName} },
-        { label: "E-mail Address", value: {setEmail} },
-        { label: "User Name", value: "@johnkinggraphics" },
-        { label: "Password", value: {setPassword}, isPassword: true },
-        { label: "Phone Number", value: "+91 6895312" },
-      ].map((item, index) => (
-        <View key={index} style={styles.inputContainer}>
-          <Text style={styles.label}>{item.label}</Text>
-          <View style={styles.input}>
-            <TextInput
-              placeholderTextColor={colors.GRAY}
-              value={item.value}
-              secureTextEntry={item.isPassword}
-              style={styles.inputField}
-              editable={!item.isPassword}
-            />
-            {item.isPassword && (
-              <Ionicons name="eye-outline" size={20} color="gray" />
-            )}
-          </View>
+    <SafeAreaView style={styles.container}>
+      <View >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headertext}>Edit Profile</Text>
+          <Ionicons name="checkmark" size={24} color="green" />
         </View>
-      ))}
-    </View>
+
+        {/* Profile Picture */}
+        <View style={styles.profilePicture}>
+          <Image
+            source={
+              user?.imageUrl
+                ? { uri: user.imageUrl }
+                : require("../assets/user.jpg")
+            }
+            style={styles.profileImage}
+          />
+          <TouchableOpacity style={styles.cameraicon}>
+            <Ionicons name="camera" size={18} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Input Fields */}
+        {[
+          { label: "Name", value: { setName } },
+          { label: "E-mail Address", value: { setEmail } },
+          { label: "User Name", value: "@johnkinggraphics" },
+          { label: "Password", value: { setPassword }, isPassword: true },
+          { label: "Phone Number", value: "+91 6895312" },
+        ].map((item, index) => (
+          <View key={index} style={styles.inputContainer}>
+            <Text style={styles.label}>{item.label}</Text>
+            <View style={styles.input}>
+              <TextInput
+                placeholderTextColor={colors.GRAY}
+                value={item.value}
+                secureTextEntry={item.isPassword}
+                style={styles.inputField}
+                editable={!item.isPassword}
+              />
+              {item.isPassword && (
+                <Ionicons name="eye-outline" size={20} color="gray" />
+              )}
+            </View>
+          </View>
+        ))}
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 10,
     marginHorizontal: 10,
   },
   header: {
@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
   },
   cameraicon: {
     position: "absolute",
-    right: 12,
-    bottom: 12,
+    right: 140,
+    bottom: 8,
     backgroundColor: "white",
     borderRadius: 50,
     padding: 8,
@@ -133,5 +133,9 @@ const styles = StyleSheet.create({
   inputField: {
     flex: 1,
     marginLeft: 10,
+  },
+  profilePicture: {
+    alignItems: "center",
+    marginBottom: 20,
   },
 });

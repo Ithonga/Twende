@@ -7,7 +7,9 @@ import {
   Alert,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import { useAuth, useOAuth, useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
@@ -16,6 +18,7 @@ import Spinner from "react-native-loading-spinner-overlay";
 import MyButton from "../../components/MyButton";
 import { Ionicons } from "@expo/vector-icons";
 import { useGoogleSignIn } from "../../utils/authHelpers";
+import colors from "../../colors/colors";
 
 //   const handleGoogleSignIn = useGoogleSignIn();
 
@@ -70,84 +73,126 @@ const Login = () => {
 
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
+  // const onGoogleSignIn = async () => {
+  //   try {
+  //     const { createdSessionId, signIn } = await startOAuthFlow();
+  
+  //     // Ensure the user is signing in and not signing up
+  //     if (signIn && createdSessionId) {
+  //       await setActive({ session: createdSessionId });
+  //       router.replace("/home"); // Redirect to home after successful sign-in
+  //     } else {
+  //       Alert.alert(
+  //         "Sign-In Failed",
+  //         "No account found. Please sign up first."
+  //       );
+  //     }
+  //   } catch (err) {
+  //     console.error("Google Sign-In Error:", err);
+  //     Alert.alert("Error", "Could not sign in with Google. Please try again.");
+  //   }
+  // };
+
   const onGoogleSignIn = async () => {
     try {
       const { createdSessionId, signIn, signUp } = await startOAuthFlow();
-
-      if (createdSessionId) {
+  
+      if (signIn && createdSessionId) {
+        // User has an account → Sign them in
         await setActive({ session: createdSessionId });
-        router.replace("/home"); // Redirect to home after successful sign-in
-      } else {
+        router.replace("/home");
+      } else if (signUp) {
+        // User does not have an account → Ask them to sign up
         Alert.alert(
-          "Sign-In Failed",
-          "Something went wrong. Please try again."
+          "No Account Found",
+          "It looks like you don’t have an account. Please sign up first.",
+          [{ text: "Sign Up", onPress: () => router.replace("/sign-up") }]
         );
+      } else {
+        // Something went wrong
+        Alert.alert("Sign-In Failed", "Could not sign in. Please try again.");
       }
     } catch (err) {
       console.error("Google Sign-In Error:", err);
       Alert.alert("Error", "Could not sign in with Google. Please try again.");
     }
   };
+  
+  
 
   return (
-    <View style={styles.container}>
-      <Spinner visible={loading} />
-      <View style={styles.innerContainer}>
-        {/* <Text style={styles.text}>ACACIA</Text> */}
-        <Image source={require("../../assets/Logo.png")} style={styles.img} />
-        <Text style={styles.text}>Login to your Account</Text>
-        <TextInput
-          autoCapitalize="none"
-          placeholder="example@gmail.com"
-          placeholderTextColor="#888"
-          value={emailAddress}
-          onChangeText={setEmailAddress}
-          style={styles.inputField}
-        />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#888"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword
-          style={styles.inputField}
-        />
-        <Pressable onPress={toggleShowPassword} style={styles.iconButton}>
-          <Ionicons
-            name={showPassword ? "eye-off" : "eye"} // Toggle between eye and eye-off icons
-            size={24}
-            color="#6c47ff"
-          />
-        </Pressable>
-        <MyButton
-          onPress={onSignInPress}
-          title="Login"
-          color={"#6c47ff"}
-          disabled={loading}
-        />
+    <SafeAreaView>
+      <KeyboardAvoidingView behavior="padding">
+        <ScrollView bounces={false}>
+          <View style={styles.container}>
+            <Spinner visible={loading} />
+            <View style={styles.innerContainer}>
+              {/* <Text style={styles.text}>ACACIA</Text> */}
+              <Image
+                source={require("../../assets/Logo.png")}
+                style={styles.img}
+              />
+              <Text style={styles.text}>Login to your Account</Text>
+              <TextInput
+                autoCapitalize="none"
+                placeholder="example@gmail.com"
+                keyboardType="email-address"
+                placeholderTextColor="#888"
+                value={emailAddress}
+                onChangeText={setEmailAddress}
+                style={styles.inputField}
+              />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor="#888"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword
+                style={styles.inputField}
+              />
+              <Pressable onPress={toggleShowPassword} style={styles.iconButton}>
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"} // Toggle between eye and eye-off icons
+                  size={24}
+                  color="#6c47ff"
+                />
+              </Pressable>
+              <MyButton
+                onPress={onSignInPress}
+                title="Login"
+                color={colors.BLUE}
+                disabled={loading}
+              />
 
-        <Text style={styles.signupText}>
-          Don't have an account?{" "}
-          <Link href="/sign-up">
-            <Text style={styles.signupLink}>Sign up</Text>
-          </Link>
-        </Text>
+              <Text style={styles.signupText}>
+                Don't have an account?{" "}
+                <TouchableOpacity onPress={() => router.replace("/sign-up")}>
+                  <Text style={styles.signupLink}>Sign up</Text>
+                </TouchableOpacity>
+              </Text>
 
-        <Link href="/reset" asChild>
-          <Pressable style={styles.button}>
-            <Text style={styles.forgot}>Forgot password?</Text>
-          </Pressable>
-        </Link>
-        <Text style={styles.signupText}>- Or sign in with -</Text>
+              <TouchableOpacity
+                asChild
+                onPress={() => router.push("/reset")}
+                style={styles.button}
+              >
+                <Text style={styles.forgot}>Forgot password?</Text>
+              </TouchableOpacity>
 
-        <TouchableOpacity onPress={onGoogleSignIn} style={styles.btn}>
-          <Image
-            source={require("../../assets/Logo.png")}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
+              <Text style={styles.signupText}>- Or sign in with -</Text>
+
+              <TouchableOpacity onPress={onGoogleSignIn} style={styles.btn}>
+                <Image
+                  source={require("../../assets/google.webp")}
+                  style={styles.icon}
+                />
+                <Text style={styles.btntext}>Sign in with Google</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -161,10 +206,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     width: "100%", // Adjust width for responsiveness
     height: "100%",
-    padding: 20,
-    paddingTop: 50,
-    borderRadius: 10,
-    elevation: 3, // Shadow effect
+    paddingHorizontal: 20,
     backgroundColor: "#f0f0f0",
   },
   inputField: {
@@ -187,12 +229,15 @@ const styles = StyleSheet.create({
     gap: "15%",
   },
   btn: {
-    width: 80,
-    height: 80,
+    width: "60%",
+    height: 40,
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
+    margin: 10,
+    flexDirection: "row",
     elevation: 3, // Shadow effect for Android
     shadowColor: "#000", // Shadow for iOS
     shadowOffset: { width: 0, height: 2 },
@@ -204,11 +249,11 @@ const styles = StyleSheet.create({
     height: 70,
     resizeMode: "contain",
     alignSelf: "center",
-    marginVertical: 50,
+    margin: 20,
   },
   icon: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
   },
   text: {
     fontSize: 25,
